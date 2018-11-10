@@ -5,12 +5,13 @@
 import pygame
 from math import floor
 import game_engine as engine
+import multiprocessing
 #from pygame.locals import *
 
 # declare our global variables for the game
 XO   = "x"   # track whose turn it is; X goes first
 grid = []
-for i in range(0, 5):
+for i in range(0, 8):
         bd = []
         for j in range(0, 5):
             bd.append('.')
@@ -57,9 +58,13 @@ def initBoard(ttt):
     # draw the grid lines
     # vertical lines...
     for i in range (100,500,100):
-        pygame.draw.line (background, (0,0,0), (i, 0), (i, 500), 2)
-        pygame.draw.line (background, (0,0,0), (0, i), (500, i), 2)
-    #pygame.draw.line (background, wheat1, (0, 0), (0, 500), 20)
+        pygame.draw.line (background, (0,0,0), (i, 0), (i, 560), 2)
+        pygame.draw.line (background, (0,0,0), (0, 0.7*i), (500, 0.7*i), 2)
+    for i in range (500,800,100):
+        pygame.draw.line (background, (0,0,0), (0, 0.7*i), (500, 0.7*i), 2)
+    pygame.draw.line (background, red, (0, 350), (500, 350), 20)
+    #pygame.draw.line (background, (0,0,0), (0, 600-40), (500, 600-40), 2)    #pygame.draw.line (background, wheat1, (0, 0), (0, 500), 20)
+    #pygame.draw.line (background, (0,0,0), (0, 700-40), (500, 700-40), 2)
     # return the board
     return background
 
@@ -86,8 +91,8 @@ def drawStatus (board):
     text = font.render(message, 1, (10, 10, 10))
 
     # copy the rendered message onto the board
-    board.fill ((250, 250, 250), (0, 600, 300, 25))
-    board.blit(text, (10, 600))
+    board.fill ((250, 250, 250), (0, 650, 300, 25))
+    board.blit(text, (10, 650))
 
 def showBoard (ttt, board):
     # redraw the game board on the display
@@ -116,16 +121,16 @@ def drawMove (board, boardRow, boardCol, Piece):
     print("draw ",Piece)
     # determine the center of the square
     centerX = ((boardCol) * 100) + 50
-    centerY = ((boardRow) * 100) + 50
+    centerY = ((boardRow) * 70) + 35
 
     # draw the appropriate piece
     if (Piece == 'o'):
-        pygame.draw.circle (board, (0,0,0), (centerX, centerY), 44, 2)
+        pygame.draw.circle (board, (0,0,0), (centerX, centerY), 30, 2)
     else:
-        pygame.draw.line (board, (0,0,0), (centerX - 25, centerY - 25), \
-                         (centerX + 25, centerY + 25), 2)
-        pygame.draw.line (board, (0,0,0), (centerX + 25, centerY - 25), \
-                         (centerX - 25, centerY + 25), 2)
+        pygame.draw.line (board, (0,0,0), (centerX - 20, centerY - 20), \
+                         (centerX + 20, centerY + 20), 2)
+        pygame.draw.line (board, (0,0,0), (centerX + 20, centerY - 20), \
+                         (centerX - 20, centerY + 20), 2)
 
     # mark the space as used
     #grid [boardRow][boardCol] = Piece
@@ -137,7 +142,7 @@ def drop_ui(board):
     global grid,col_selected
     global XO
     
-    for r in range(4,-1,-1):
+    for r in range(7,-1,-1):
         if grid[r][col_selected] =="." : 
             grid[r][col_selected] = XO
             drawMove(board,r,col_selected,XO)
@@ -193,8 +198,8 @@ def board_change(board):
     board = initBoard (ttt)
     ttt.fill(white)
     ttt.blit (board, (0, 0))
-    pygame.draw.line (board, wheat1, (100*col_selected+50, 0), (100*col_selected+50, 500), 50)
-    [drawMove(board,r,c,grid[r][c]) for r in range(0,5) for c in range(0,5) if grid[r][c] is not "."]
+    pygame.draw.line (board, wheat1, (100*col_selected+50, 0), (100*col_selected+50, 560), 50)
+    [drawMove(board,r,c,grid[r][c]) for r in range(0,8) for c in range(0,5) if grid[r][c] is not "."]
     
     rotated =0
     return board
@@ -230,6 +235,8 @@ def clickBoard(board):
     if (XO == "x"): XO = "o"
     else:   XO = "x"
     """
+def Oturn(board):
+    pass    
 def gameWon(board):
     # determine if anyone has won the game
     # ---------------------------------------------------------------
@@ -243,12 +250,12 @@ def gameWon(board):
            (grid [row][0] is not ".")):
             # this row won
             winner = grid[row][0]
-            pygame.draw.line (board, (250,0,0), (0, (row + 1)*100 - 50), \
-                              (500, (row + 1)*100 - 50), 2)
+            pygame.draw.line (board, (250,0,0), (0, (row + 1)*70 - 35), \
+                              (500, (row + 1)*70 - 35), 2)
             break
 
     # check for winning columns
-    for col in range (0, 3):
+    for col in range (0, 5):
         if (grid[0][col] == grid[1][col] == grid[2][col]== grid[3][col]== grid[4][col]) and \
            (grid[0][col] is not "."):
             # this column won
@@ -289,7 +296,7 @@ def game_main():
             #display_col(board)    
             # check for a winner
             gameWon (board)
-            
+            Oturn(board)
             #
             if rotated==1: board = board_change(board)
             # update the display
