@@ -59,9 +59,13 @@ def initBoard(ttt):
     for i in range (100,500,100):
         pygame.draw.line (background, (0,0,0), (i, 0), (i, 500), 2)
         pygame.draw.line (background, (0,0,0), (0, i), (500, i), 2)
+    #pygame.draw.line (background, wheat1, (0, 0), (0, 500), 20)
     # return the board
     return background
 
+def display_col(board):
+    global col_selected
+    pygame.draw.line (board, wheat1, (100*col_selected+50, 0), (100*col_selected+50, 500), 50)    
 def drawStatus (board):
     # draw the status (i.e., player turn, etc) at the bottom of the board
     # ---------------------------------------------------------------
@@ -118,10 +122,10 @@ def drawMove (board, boardRow, boardCol, Piece):
     if (Piece == 'o'):
         pygame.draw.circle (board, (0,0,0), (centerX, centerY), 44, 2)
     else:
-        pygame.draw.line (board, (0,0,0), (centerX - 22, centerY - 22), \
-                         (centerX + 22, centerY + 22), 2)
-        pygame.draw.line (board, (0,0,0), (centerX + 22, centerY - 22), \
-                         (centerX - 22, centerY + 22), 2)
+        pygame.draw.line (board, (0,0,0), (centerX - 25, centerY - 25), \
+                         (centerX + 25, centerY + 25), 2)
+        pygame.draw.line (board, (0,0,0), (centerX + 25, centerY - 25), \
+                         (centerX - 25, centerY + 25), 2)
 
     # mark the space as used
     #grid [boardRow][boardCol] = Piece
@@ -130,13 +134,13 @@ def drop_ui(board):
     global i
     i+=1
     print(i)
-    global grid
+    global grid,col_selected
     global XO
     
     for r in range(4,-1,-1):
-        if grid[r][0] =="." : 
-            grid[r][0] = XO
-            drawMove(board,r,0,XO)
+        if grid[r][col_selected] =="." : 
+            grid[r][col_selected] = XO
+            drawMove(board,r,col_selected,XO)
             if (XO == "x"): XO = "o"
             else:   XO = "x"
             break
@@ -159,7 +163,7 @@ def drop_ui(board):
     """
 rotated = 0     
 def rot_ui(board):
-    global grid,rotated
+    global grid,rotated,col_selected
     global XO
     print("new board start")
     
@@ -167,7 +171,7 @@ def rot_ui(board):
     
     print("before new grid")
     
-    grid = engine.rotate(0,grid)
+    grid = engine.rotate(col_selected,grid)
     print(grid)
     if (XO == "x"): XO = "o"
     else:   XO = "x"
@@ -189,25 +193,35 @@ def board_change(board):
     board = initBoard (ttt)
     ttt.fill(white)
     ttt.blit (board, (0, 0))
-    #[drawMove(board,grid.index(i),i.index(a),a) for i in grid for a in i if a is not "."]
+    pygame.draw.line (board, wheat1, (100*col_selected+50, 0), (100*col_selected+50, 500), 50)
     [drawMove(board,r,c,grid[r][c]) for r in range(0,5) for c in range(0,5) if grid[r][c] is not "."]
+    
     rotated =0
     return board
+
+col_selected = 0
 def clickBoard(board):
     # determine where the user clicked and if the space is not already
     # occupied, draw the appropriate piece there (X or O)
     # ---------------------------------------------------------------
     # board : the game board surface
     
-    global grid, XO
+    global grid, XO, col_selected,rotated
     
     (mouseX, mouseY) = pygame.mouse.get_pos()
+    if(mouseX>500 or mouseY>500):   return
     (row, col) = boardPos (mouseX, mouseY)
-
+    col_selected = col
+    rotated = 1
     # make sure no one's used this space
     if ((grid[row][col] == "x") or (grid[row][col] == "o")):
         # this space is in use
         return
+    
+    #board.fill (wheat1, (0, 100, 100, 100))
+    #highlight = pygame.Surface((100, 100))
+    #highlight.fill(wheat1)
+    #board.blit((0,0),(0,100,100,100))
     """
     # draw an X or O
     drawMove (board, row, col, XO)    ###check edit remove draw move if outside area
@@ -272,7 +286,7 @@ def game_main():
             elif event.type is pygame.MOUSEBUTTONDOWN:
                 # the user clicked; place an X or O
                 clickBoard(board)
-    
+            #display_col(board)    
             # check for a winner
             gameWon (board)
             
@@ -316,7 +330,7 @@ red = (255,0,0)
 bright_red = (127,0,0)
 green = (0,255,0)
 bright_green = (0,127,0)
-
+wheat1 = (255,231,186)
 display_height = 800
 display_width = 800
 
