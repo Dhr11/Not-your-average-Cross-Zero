@@ -1,15 +1,13 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
 
-# import necessary modules
 import pygame
 from math import floor
 import game_engine as engine
 import multiprocessing
-#from pygame.locals import *
 
-# declare our global variables for the game
-XO   = "x"   # track whose turn it is; X goes first
+
+XO   = "x"   # turn player
 grid = []
 for i in range(0, 8):
         bd = []
@@ -63,9 +61,6 @@ def initBoard(ttt):
     for i in range (500,800,100):
         pygame.draw.line (background, (0,0,0), (0, 0.7*i), (500, 0.7*i), 2)
     pygame.draw.line (background, red, (0, 350), (500, 350), 20)
-    #pygame.draw.line (background, (0,0,0), (0, 600-40), (500, 600-40), 2)    #pygame.draw.line (background, wheat1, (0, 0), (0, 500), 20)
-    #pygame.draw.line (background, (0,0,0), (0, 700-40), (500, 700-40), 2)
-    # return the board
     return background
 
 def display_col(board):
@@ -73,11 +68,7 @@ def display_col(board):
     pygame.draw.line (board, wheat1, (100*col_selected+50, 0), (100*col_selected+50, 500), 50)    
 def drawStatus (board):
     # draw the status (i.e., player turn, etc) at the bottom of the board
-    # ---------------------------------------------------------------
-    # board : the initialized game board surface where the status will
-    #         be drawn
 
-    # gain access to global variables
     global XO, winner
 
     # determine the status message
@@ -102,8 +93,8 @@ def showBoard (ttt, board):
 
     drawStatus (board)
     ttt.blit (board, (0, 0))
-    button("Rotate",650,350,100,50,green,bright_green,lambda: rot_ui(board))
-    button("Drop",650,450,100,50,green,bright_green,lambda: drop_ui(board))
+    button("Rotate",600,350,100,50,green,bright_green,lambda: rot_ui(board))
+    button("Drop",600,450,100,50,green,bright_green,lambda: drop_ui(board))
     pygame.display.flip()
     
 def boardPos (mouseX, mouseY):
@@ -149,24 +140,9 @@ def drop_ui(board):
             if (XO == "x"): XO = "o"
             else:   XO = "x"
             break
-    """
-    print("new board start")
-    board = initBoard (ttt)
-    ttt.blit (board, (0, 0))
-    pygame.display.flip()
-    print(grid," dsds")
-    
-    print("befpre new grid")
-    
-    grid = engine.drop(0,XO,grid)
-    print(grid)
-    if (XO == "x"): XO = "o"
-    else:   XO = "x"
-    print("new board print start")
-    [drawMove(board,grid.index(i),i.index(a),a) for i in grid for a in i if a is not "_"]
-    print("new board done")
-    """
+
 rotated = 0     
+
 def rot_ui(board):
     global grid,rotated,col_selected
     global XO
@@ -182,16 +158,7 @@ def rot_ui(board):
     else:   XO = "x"
     print("new board print start")
     rotated = 1
-    """
-    board = initBoard (ttt)
-    ttt.fill(white)
-    ttt.blit (board, (0, 0))
-    #pygame.display.update()
-    pygame.display.update()
-    [drawMove(board,grid.index(i),i.index(a),a) for i in grid for a in i if a is not "."]
-    pygame.display.update()
-    print("new board done")
-    """
+
 def board_change(board):
     global rotated
     
@@ -214,7 +181,7 @@ def clickBoard(board):
     global grid, XO, col_selected,rotated
     
     (mouseX, mouseY) = pygame.mouse.get_pos()
-    if(mouseX>500 or mouseY>500):   return
+    if(mouseX>500 or mouseY>560):   return
     (row, col) = boardPos (mouseX, mouseY)
     col_selected = col
     rotated = 1
@@ -223,10 +190,6 @@ def clickBoard(board):
         # this space is in use
         return
     
-    #board.fill (wheat1, (0, 100, 100, 100))
-    #highlight = pygame.Surface((100, 100))
-    #highlight.fill(wheat1)
-    #board.blit((0,0),(0,100,100,100))
     """
     # draw an X or O
     drawMove (board, row, col, XO)    ###check edit remove draw move if outside area
@@ -269,13 +232,13 @@ def gameWon(board):
        (grid[0][0] is not "."):
         # game won diagonally left to right
         winner = grid[0][0]
-        pygame.draw.line (board, (250,0,0), (50, 50), (450, 450), 2)
+        pygame.draw.line (board, red, (50, 35), (450, 315), 2)
 
     if (grid[0][4] == grid[1][3] == grid[2][2]== grid[3][1]== grid[4][0]) and \
        (grid[0][4] is not "."):
         # game won diagonally right to left
         winner = grid[0][4]
-        pygame.draw.line (board, (250,0,0), (450, 50), (50, 450), 2)
+        pygame.draw.line (board, (250,0,0), (50, 315), (450, 35), 2)
 
 
 def game_main():
@@ -301,7 +264,7 @@ def game_main():
             if rotated==1: board = board_change(board)
             # update the display
             
-            showBoard (ttt, board)# -*- coding: utf-8 -*-
+            showBoard (ttt, board)
             print(grid)          
 
 def intro():
@@ -342,7 +305,7 @@ display_height = 800
 display_width = 800
 
 pygame.init()
-size = [800,800] #300 325 initial
+size = [700,700] #300 325 initial
 ttt = pygame.display.set_mode (size)
 pygame.display.set_caption ('Not your average Cross-Zero')
 
