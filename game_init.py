@@ -4,18 +4,16 @@
 # import necessary modules
 import pygame
 from math import floor
+import game_engine as engine
 #from pygame.locals import *
 
 # declare our global variables for the game
-XO   = "X"   # track whose turn it is; X goes first
-##grid = [ [ None, None, None ], \
-#         [ None, None, None ], \
-#         [ None, None, None ] ]
+XO   = "x"   # track whose turn it is; X goes first
 grid = []
 for i in range(0, 5):
         bd = []
         for j in range(0, 5):
-            bd.append('_')
+            bd.append('.')
         grid.append(bd)
 winner = None
 
@@ -61,18 +59,6 @@ def initBoard(ttt):
     for i in range (100,500,100):
         pygame.draw.line (background, (0,0,0), (i, 0), (i, 500), 2)
         pygame.draw.line (background, (0,0,0), (0, i), (500, i), 2)
-    """
-    pygame.draw.line (background, (0,0,0), (100, 0), (100, 500), 2)
-    pygame.draw.line (background, (0,0,0), (200, 0), (200, 500), 2)
-    pygame.draw.line (background, (0,0,0), (300, 0), (300, 500), 2)
-    pygame.draw.line (background, (0,0,0), (400, 0), (400, 500), 2)
-    
-    # horizontal lines...
-    pygame.draw.line (background, (0,0,0), (0, 100), (500, 100), 2)
-    pygame.draw.line (background, (0,0,0), (0, 200), (500, 200), 2)
-    pygame.draw.line (background, (0,0,0), (0, 300), (500, 300), 2)
-    pygame.draw.line (background, (0,0,0), (0, 400), (500, 400), 2)
-    """
     # return the board
     return background
 
@@ -107,54 +93,29 @@ def showBoard (ttt, board):
 
     drawStatus (board)
     ttt.blit (board, (0, 0))
+    button("Rotate",650,350,100,50,green,bright_green,lambda: rot_ui(board))
+    button("Drop",650,450,100,50,green,bright_green,lambda: drop_ui(board))
     pygame.display.flip()
     
 def boardPos (mouseX, mouseY):
-    # given a set of coordinates from the mouse, determine which board space
-    # (row, column) the user clicked in.
-    # ---------------------------------------------------------------
     # mouseX : the X coordinate the user clicked
     # mouseY : the Y coordinate the user clicked
 
     # determine the row the user clicked
     row = floor(mouseY/100) if mouseY  <500 else 4
     col = floor(mouseX/100) if mouseX  <500 else 4
-    """if (mouseY < 100):
-        row = 0
-    elif (mouseY < 200):
-        row = 1
-    elif (mouseY < 300):
-        row = 2
-    elif (mouseY < 400):
-        row = 3
-    else:
-        row = 4    
-    
-    # determine the column the user clicked
-    if (mouseX < 100):
-        col = 0
-    elif (mouseX < 200):
-        col = 1
-    else:
-        col = 2
-       """         
     # return the tuple containg the row & column
     return (row, col)
 
 def drawMove (board, boardRow, boardCol, Piece):
-    # draw an X or O (Piece) on the board in boardRow, boardCol
-    # ---------------------------------------------------------------
-    # board     : the game board surface
-    # boardRow,
-    # boardCol  : the Row & Col in which to draw the piece (0 based)
-    # Piece     : X or O
-    
+
+    print("draw ",Piece)
     # determine the center of the square
     centerX = ((boardCol) * 100) + 50
     centerY = ((boardRow) * 100) + 50
 
     # draw the appropriate piece
-    if (Piece == 'O'):
+    if (Piece == 'o'):
         pygame.draw.circle (board, (0,0,0), (centerX, centerY), 44, 2)
     else:
         pygame.draw.line (board, (0,0,0), (centerX - 22, centerY - 22), \
@@ -163,8 +124,75 @@ def drawMove (board, boardRow, boardCol, Piece):
                          (centerX - 22, centerY + 22), 2)
 
     # mark the space as used
-    grid [boardRow][boardCol] = Piece
+    #grid [boardRow][boardCol] = Piece
+i=0
+def drop_ui(board):
+    global i
+    i+=1
+    print(i)
+    global grid
+    global XO
     
+    for r in range(4,-1,-1):
+        if grid[r][0] =="." : 
+            grid[r][0] = XO
+            drawMove(board,r,0,XO)
+            if (XO == "x"): XO = "o"
+            else:   XO = "x"
+            break
+    """
+    print("new board start")
+    board = initBoard (ttt)
+    ttt.blit (board, (0, 0))
+    pygame.display.flip()
+    print(grid," dsds")
+    
+    print("befpre new grid")
+    
+    grid = engine.drop(0,XO,grid)
+    print(grid)
+    if (XO == "x"): XO = "o"
+    else:   XO = "x"
+    print("new board print start")
+    [drawMove(board,grid.index(i),i.index(a),a) for i in grid for a in i if a is not "_"]
+    print("new board done")
+    """
+rotated = 0     
+def rot_ui(board):
+    global grid,rotated
+    global XO
+    print("new board start")
+    
+    print(grid," dsds")
+    
+    print("before new grid")
+    
+    grid = engine.rotate(0,grid)
+    print(grid)
+    if (XO == "x"): XO = "o"
+    else:   XO = "x"
+    print("new board print start")
+    rotated = 1
+    """
+    board = initBoard (ttt)
+    ttt.fill(white)
+    ttt.blit (board, (0, 0))
+    #pygame.display.update()
+    pygame.display.update()
+    [drawMove(board,grid.index(i),i.index(a),a) for i in grid for a in i if a is not "."]
+    pygame.display.update()
+    print("new board done")
+    """
+def board_change(board):
+    global rotated
+    
+    board = initBoard (ttt)
+    ttt.fill(white)
+    ttt.blit (board, (0, 0))
+    #[drawMove(board,grid.index(i),i.index(a),a) for i in grid for a in i if a is not "."]
+    [drawMove(board,r,c,grid[r][c]) for r in range(0,5) for c in range(0,5) if grid[r][c] is not "."]
+    rotated =0
+    return board
 def clickBoard(board):
     # determine where the user clicked and if the space is not already
     # occupied, draw the appropriate piece there (X or O)
@@ -177,19 +205,17 @@ def clickBoard(board):
     (row, col) = boardPos (mouseX, mouseY)
 
     # make sure no one's used this space
-    if ((grid[row][col] == "X") or (grid[row][col] == "O")):
+    if ((grid[row][col] == "x") or (grid[row][col] == "o")):
         # this space is in use
         return
-
+    """
     # draw an X or O
     drawMove (board, row, col, XO)    ###check edit remove draw move if outside area
 
     # toggle XO to the other player's move
-    if (XO == "X"):
-        XO = "O"
-    else:
-        XO = "X"
-    
+    if (XO == "x"): XO = "o"
+    else:   XO = "x"
+    """
 def gameWon(board):
     # determine if anyone has won the game
     # ---------------------------------------------------------------
@@ -200,7 +226,7 @@ def gameWon(board):
     # check for winning rows
     for row in range (0, 5):
         if ((grid [row][0] == grid[row][1] == grid[row][2]==grid[row][3]==grid[row][4]) and \
-           (grid [row][0] is not "_")):
+           (grid [row][0] is not ".")):
             # this row won
             winner = grid[row][0]
             pygame.draw.line (board, (250,0,0), (0, (row + 1)*100 - 50), \
@@ -210,7 +236,7 @@ def gameWon(board):
     # check for winning columns
     for col in range (0, 3):
         if (grid[0][col] == grid[1][col] == grid[2][col]== grid[3][col]== grid[4][col]) and \
-           (grid[0][col] is not "_"):
+           (grid[0][col] is not "."):
             # this column won
             winner = grid[0][col]
             pygame.draw.line (board, (250,0,0), ((col + 1)* 100 - 50, 0), \
@@ -219,13 +245,13 @@ def gameWon(board):
 
     # check for diagonal winners
     if (grid[0][0] == grid[1][1] == grid[2][2]== grid[3][3]== grid[4][4]) and \
-       (grid[0][0] is not "_"):
+       (grid[0][0] is not "."):
         # game won diagonally left to right
         winner = grid[0][0]
         pygame.draw.line (board, (250,0,0), (50, 50), (450, 450), 2)
 
     if (grid[0][4] == grid[1][3] == grid[2][2]== grid[3][1]== grid[4][0]) and \
-       (grid[0][4] is not "_"):
+       (grid[0][4] is not "."):
         # game won diagonally right to left
         winner = grid[0][4]
         pygame.draw.line (board, (250,0,0), (450, 50), (50, 450), 2)
@@ -240,7 +266,7 @@ def game_main():
     
     while (running == 1):
         for event in pygame.event.get():
-            button("Drop",650,550,50,50,green,bright_green,game_main)
+            
             if event.type is pygame.QUIT:
                 running = 0
             elif event.type is pygame.MOUSEBUTTONDOWN:
@@ -250,10 +276,12 @@ def game_main():
             # check for a winner
             gameWon (board)
             
-            #button("Rotate",650,450,100,50,green,bright_green,game_main)
+            #
+            if rotated==1: board = board_change(board)
             # update the display
+            
             showBoard (ttt, board)# -*- coding: utf-8 -*-
-    
+            print(grid)          
 
 def intro():
 
@@ -295,6 +323,6 @@ display_width = 800
 pygame.init()
 size = [800,800] #300 325 initial
 ttt = pygame.display.set_mode (size)
-pygame.display.set_caption ('Project')
+pygame.display.set_caption ('Not your average Cross-Zero')
 
 intro()
