@@ -4,8 +4,8 @@
 import pygame
 from math import floor
 import game_engine as engine
-import multiprocessing
-
+#import multiprocessing
+from subprocess import STDOUT, check_output, Popen, PIPE, TimeoutExpired
 
 XO   = "x"   # turn player
 grid = []
@@ -109,7 +109,7 @@ def boardPos (mouseX, mouseY):
 
 def drawMove (board, boardRow, boardCol, Piece):
 
-    print("draw ",Piece)
+    #print("draw ",Piece)
     # determine the center of the square
     centerX = ((boardCol) * 100) + 50
     centerY = ((boardRow) * 70) + 35
@@ -125,11 +125,7 @@ def drawMove (board, boardRow, boardCol, Piece):
 
     # mark the space as used
     #grid [boardRow][boardCol] = Piece
-i=0
 def drop_ui(board):
-    global i
-    i+=1
-    print(i)
     global grid,col_selected
     global XO
     
@@ -146,17 +142,9 @@ rotated = 0
 def rot_ui(board):
     global grid,rotated,col_selected
     global XO
-    print("new board start")
-    
-    print(grid," dsds")
-    
-    print("before new grid")
-    
     grid = engine.rotate(col_selected,grid)
-    print(grid)
     if (XO == "x"): XO = "o"
     else:   XO = "x"
-    print("new board print start")
     rotated = 1
 
 def board_change(board):
@@ -198,7 +186,18 @@ def clickBoard(board):
     if (XO == "x"): XO = "o"
     else:   XO = "x"
     """
+    
 def Oturn(board):
+    global XO, grid , rotated
+    if XO=='o':
+        #output = check_output('python game_engine.py 5 o '+engine.boardstring(grid)+' 5', stderr=STDOUT, timeout=4)
+        proc = Popen(['python','game_engine.py','5' ,'o',engine.boardstring(grid),'2'], stdout=PIPE, stderr=STDOUT)
+        #print(proc.stdout(timeout=4)[0])
+        #print((str(proc.communicate()[0]).split()[-1]).split('\\')[0])
+        grid = engine.stringboard((str(proc.communicate()[0]).split()[-1]).split('\\')[0],5)
+        rotated =1
+        XO='x'
+        
     pass    
 def gameWon(board):
     # determine if anyone has won the game
@@ -224,7 +223,7 @@ def gameWon(board):
             # this column won
             winner = grid[0][col]
             pygame.draw.line (board, (250,0,0), ((col + 1)* 100 - 50, 0), \
-                              ((col + 1)* 100 - 50, 500), 2)
+                              ((col + 1)* 100 - 50, 315), 2)
             break
 
     # check for diagonal winners
@@ -258,14 +257,16 @@ def game_main():
                 clickBoard(board)
             #display_col(board)    
             # check for a winner
+            
             gameWon (board)
+            showBoard (ttt, board)
             Oturn(board)
             #
             if rotated==1: board = board_change(board)
             # update the display
             
-            showBoard (ttt, board)
-            print(grid)          
+            
+            #print(grid)          
 
 def intro():
 
