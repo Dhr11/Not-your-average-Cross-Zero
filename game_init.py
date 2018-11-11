@@ -191,7 +191,9 @@ def Oturn(board):
     global XO, grid , rotated
     if XO=='o':
         #output = check_output('python game_engine.py 5 o '+engine.boardstring(grid)+' 5', stderr=STDOUT, timeout=4)
-        proc = Popen(['python','game_engine.py','5' ,'o',engine.boardstring(grid),'2'], stdout=PIPE, stderr=STDOUT)
+        CREATE_NO_WINDOW = 0x08000000
+        
+        proc = Popen(['python','game_engine.py','5' ,'o',engine.boardstring(grid),'1'], stdout=PIPE, stderr=STDOUT,creationflags=CREATE_NO_WINDOW)
         #print(proc.stdout(timeout=4)[0])
         #print((str(proc.communicate()[0]).split()[-1]).split('\\')[0])
         grid = engine.stringboard((str(proc.communicate()[0]).split()[-1]).split('\\')[0],5)
@@ -281,7 +283,7 @@ def intro():
                 
         ttt.fill(white)
         largeText = pygame.font.SysFont("comicsansms",35)
-        TextSurf, TextRect = text_objects("Betsy - Tic tac toe for adults", largeText)
+        TextSurf, TextRect = text_objects("Betsy - Modern Tic tac toe", largeText)
         TextRect.center = ((display_width/2),(display_height/2))
         ttt.blit(TextSurf, TextRect)
 
