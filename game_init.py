@@ -4,6 +4,7 @@
 import pygame
 from math import floor
 import game_engine as engine
+import wrap_sentences as wraps
 #import multiprocessing
 from subprocess import STDOUT, check_output, Popen, PIPE, TimeoutExpired
 
@@ -284,10 +285,25 @@ def intro():
         ttt.fill(white)
         largeText = pygame.font.SysFont("comicsansms",35)
         TextSurf, TextRect = text_objects("Betsy - Modern Tic tac toe", largeText)
-        TextRect.center = ((display_width/2),(display_height/2))
+        TextRect.center = ((display_width/3),(display_height/8))
         ttt.blit(TextSurf, TextRect)
 
-        button("GO!",150,450,100,50,green,bright_green,game_main)
+        my_string = """           Rules/Modifications  
+            1. In the 8x5 grid, aim is to win by completing a line of X's in 5 cells. The bottom marked 3 region is not counted. 
+            2. You can win by having a line of 5 X's in row column or diaganol
+            3. Instead of placing X's, you have to select a column by clicking it, thus highlighting it, then click on drop to drop the X in the empty space in that column
+            4. You can also rotate the column in you r turn instead of dropping. Rotate, rotates the column down"""
+        my_rect = pygame.Rect((40, 200, 600, 300))
+        instText = pygame.font.SysFont("comicsansms",15)
+        
+        rendered_text = wraps.render_textrect(my_string, instText, my_rect, (48, 48, 48), (216, 216, 216), 0)
+
+        
+        #TextSurfinst, TextRectinst = text_objects(, instText)
+        #TextRectinst.center = ((display_width/2),(display_height/4))
+        ttt.blit(rendered_text, my_rect.topleft)
+        
+        button("GO!",150,600,100,50,green,bright_green,game_main)
         #button("Quit",550,450,100,50,red,bright_red,quitgame)
 
         pygame.display.update()
